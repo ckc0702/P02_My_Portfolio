@@ -1,0 +1,14 @@
+.skill__brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.skill__brand-img {
+    width: 2.5rem;
+    aspect-ratio: 1/1;
+    border-radius: var(--border-radius-2);
+    overflow: hidden;
+    transition: var(--transition);
+}

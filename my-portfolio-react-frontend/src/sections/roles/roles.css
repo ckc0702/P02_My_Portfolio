@@ -1,0 +1,53 @@
+.roles__container{
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 25% of available space */
+    gap: 2rem 4rem;
+}
+
+.card.role {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.role__icon {
+    background: var(--color-primary);
+    padding: 0.6rem;
+    border-radius: var(--border-radius-3);
+    font-size: 1.5rem;
+    color: var(--color-white);
+    transition: var(--transition);
+}
+
+.role:hover .role__icon {
+    background: var(--color-light);
+    color: var(--color-primary);
+}
+
+.role h4 {
+    margin-bottom: 0.7rem;
+}
+
+.role p {
+    text-align: justify;
+}
+
+/* MEDIA QUERIES (tablets) */
+@media screen and (max-width: 1024px) {
+    
+    .roles__container{
+        gap: 1.5rem;
+    }
+}
+
+/* MEDIA QUERIES (phones) */
+@media screen and (max-width: 600px) {
+    
+    .roles__container{
+        grid-template-columns: 1fr;
+    }
+
+    .card.role {
+        gap: 1.2rem;
+    }
+}
