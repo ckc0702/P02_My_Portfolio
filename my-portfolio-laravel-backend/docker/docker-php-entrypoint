@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+# write the php-fpm config
+# [sock = instruct php-fpm to use given unix socker for listening to request]
+# [owner, group = user and user group php-fpm should listen to. www-data user and user group exist in any linux distribution by default]
+{ \
+    echo listen = /var/run/php-fpm.sock; \
+    echo listen.owner = www-data; \
+    echo listen.group = www-data; \
+    echo pm.max_children = "$FPM_PM_MAX_CHILDREN"; \
+    echo pm.start_servers = "$FPM_PM_START_SERVERS"; \
+    echo pm.min_spare_servers = "$FPM_PM_MIN_SPARE_SERVERS"; \
+    echo pm.max_spare_servers = "$FPM_PM_MAX_SPARE_SERVERS"; \
+} > /usr/local/etc/php-fpm.d/zzz-app.conf
+
+exec "$@"

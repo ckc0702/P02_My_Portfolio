@@ -1,0 +1,83 @@
+version: "3.8"
+
+services: 
+    appdb:
+        image: 'mariadb:latest'
+        container_name: my-portfolio-app-db
+        restart: unless-stopped
+        ports:
+        - 3306:3306
+        environment:
+            MYSQL_DATABASE: my_portfolio_db
+            MYSQL_ROOT_PASSWORD: "programmer666"
+            MYSQL_PASSWORD: "programmer666"
+            MYSQL_USER: programmer69
+            # MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+        volumes:
+            # - ./my-portfolio-laravel-backend/src/database/my_portfolio.sql:/docker-entrypoint-initdb.d/ddl.sql 
+            - ./initdb:/docker-entrypoint-initdb.d
+            # - mariadb-data:/var/lib/mysql
+        networks:
+            - db-network
+      
+    backend:
+        build:
+            context: ./my-portfolio-laravel-backend
+            dockerfile: Dockerfile
+        container_name: my-portfolio-app-laravel-backend
+        # This script runs the default entrypoint script first. Then it resets the directory permissions because in development, you’ll mount your local src directory inside the container and it may mess up the permissions. After that, the script just regenerates the autoload. Since you’ve overridden the entrypoint, you’ll have to write the command once again
+        entrypoint: /usr/local/bin/docker-php-entrypoint-dev
+        command: ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisord.conf"]
+        volumes:
+            - ./my-portfolio-laravel-backend/src:/var/www/app
+        environment: 
+            - APP_ENV=local
+            - APP_KEY=base64:tLmYfUrrZITzLIkSjFnV+PCAFxkdU+duUxjVSIlrrHo=
+            - APP_DEBUG=true
+            - DB_CONNECTION=mysql
+            - DB_HOST=appdb
+            - DB_PORT=3306
+            - DB_DATABASE=my_portfolio_db
+            - DB_USERNAME=programmer69
+            - DB_PASSWORD="programmer666"
+        restart: unless-stopped
+        # expose port 80 from inside container to port 8000 on host system
+        ports: 
+            - 8000:80
+        networks:
+          - app-network
+          - db-network
+        depends_on:
+            - appdb
+    
+    frontend:
+        build:
+            context: ./my-portfolio-react-frontend
+            dockerfile: Dockerfile
+        container_name: my-portfolio-app-react-frontend
+        ports: 
+            - 3000:3000
+        networks: 
+            - app-network
+
+    phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      restart: unless-stopped
+      environment:
+        PMA_HOST: appdb
+        MYSQL_ROOT_PASSWORD: "programmer666"
+      depends_on:
+        - appdb
+      ports:
+        - 8443:80
+      networks:
+        - db-network
+
+networks:
+  app-network:
+    name : frontend-network
+    driver: bridge
+  db-network:
+    name: backend-network
+volumes:
+    mariadb-data:
